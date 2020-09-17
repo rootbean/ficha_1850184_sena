@@ -1,0 +1,19 @@
+
+Se requiere crear una base de datos para almacenar información de los colaboradores y sus respectivas ciudades
+
+La información que se requiere para los colaboradores es:
+
+- Nombre
+- Apellidos
+- Genero
+- Fecha de Nácimiento
+- Cargo 
+- Salario
+- Estado
+- Ciudad
+
+La información que se requiere de las ciudades es:
+- Nombre
+- Estado
+
+Usuarios - Roles
