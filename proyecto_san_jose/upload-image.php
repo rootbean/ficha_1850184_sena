@@ -14,7 +14,26 @@ require_once('funciones.php');
 if ($_FILES) {
 
   $archivo = $_FILES['archivo'];
-  upload_image($archivo);
+  $avatar = upload_image($archivo);
+
+  if ($avatar == null) {
+    echo 'La imagen no se subió';
+  } else {
+
+    $usuario_id = $_SESSION['usuario_id'];
+
+    $connection_bd = conectarBD();
+
+    $sql_user_update = "UPDATE usuarios SET usuarios_url_avatar=? WHERE usuarios_id=?";
+
+    $result_update = $connection_bd->prepare($sql_user_update);
+    $result_update-> execute(array($avatar, $usuario_id));
+
+    $_SESSION['usuario_avatar'] = $avatar;
+
+    echo 'Usuario actualizado correctamente!';
+
+  }
 
 }
 

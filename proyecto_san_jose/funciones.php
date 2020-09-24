@@ -1,12 +1,14 @@
 <?php
 
-
 function conectarBD() {
-    $mysqli = mysqli_connect("localhost", "root", "", "ejemplo_clase_san_jose");
-
-    if ($mysqli == false) {
-      echo 'Error al conectar con la BD';
-      die(); // Matar procesos PHP
+    
+    try {
+        $connection_bd = new PDO('mysql:host=localhost; dbname=ejemplo_clase_san_jose', 'root', '');
+        $connection_bd -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $connection_bd -> exec('SET CHARACTER SET utf8');
+        return $connection_bd;
+    } catch (Exception $e) {
+        die('Error: '.$e->GetMessage());
     }
 }
 
@@ -41,11 +43,14 @@ function upload_image($archivo) {
 
     if ($validacion_ok == 0 ) {
         echo 'La imagen no se puede subir';
+        return null;
     } else {
         if (move_uploaded_file($archivo['tmp_name'], $url_final)) {
             echo 'La imagen fue subida correctamente!';
+            return $url_final;
         } else {
             echo 'Hubo un error al subir la imagen';
+            return null;
         }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+include_once('funciones.php');
+
 $msg = "";
 
 // Variables para guardar los datos del usuario a registrar en la base de datos
@@ -42,27 +44,25 @@ if (
   } else if (strlen($password) < 8) {
     $msg.="La contraseña debe tener mínimo 8 caracteres <br>";
   } else {
-     
-    $mysqli = mysqli_connect("localhost", "root", "", "ejemplo_clase_san_jose");
 
-    if ($mysqli == false) {
-      echo 'Error al conectar con la BD';
-      die(); // Matar procesos PHP
-    }
+    $connection_bd = conectarBD();
 
-    $query_users = "SELECT * FROM `usuarios` WHERE `usuarios_email`='".$email."' ";
+    $query_users = "SELECT * FROM usuarios WHERE usuarios_email=?";
 
-    $resultado = $mysqli->query($query_users);
-    $usuarios = $resultado->fetch_all(MYSQLI_ASSOC);
+    $result_query = $connection_bd->prepare($query_users);
+    $result_query -> execute(array($email));
+    $result_query = $result_query->fetchAll(PDO:: FETCH_ASSOC);
 
-    $cantidad_usuarios = count($usuarios);
+    $cantidad_usuarios = count($result_query);
 
     if ($cantidad_usuarios == 0) {
       $password = sha1($password);
 
-      $insert_usuario = "INSERT INTO `usuarios`(`usuarios_nombres`, `usuarios_email`, `usuarios_password`) VALUES ('".$nombres."', '".$email."', '".$password."')";
+      $insert_usuario = "INSERT INTO usuarios(usuarios_nombres, usuarios_email, usuarios_password) VALUES (?, ?, ?)";
       
-      $mysqli->query($insert_usuario);
+      $result_insert = $connection_bd->prepare($insert_usuario);
+      $result_insert -> execute(array($nombres, $email, $password));
+      
       $msg.="Usuario registrado correctamente! <br>";
     
     } else {

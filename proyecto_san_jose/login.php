@@ -1,7 +1,12 @@
 <?php
 session_start();
 
+include_once('funciones.php');
+
 $_SESSION['autorizado'] = false;
+$_SESSION['usuario_id'] = null;
+$_SESSION['usuario_nombre'] = '';
+$_SESSION['usuario_avatar'] = '';
 
 $msg = "";
 
@@ -21,24 +26,24 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
   $email = strip_tags($_POST['email']);
   $password = strip_tags($_POST['password']);
 
-  $mysqli = mysqli_connect("localhost", "root", "", "ejemplo_clase_san_jose");
-
-  if ($mysqli == false) {
-    echo 'Error al conectar con la BD';
-    die(); // Matar procesos PHP
-  }
+  $connection_bd = conectarBD();
 
   $password = sha1($password);
 
-  $query_users = "SELECT * FROM `usuarios` WHERE `usuarios_email`='".$email."' AND `usuarios_password`='".$password."' ";
+  $query_users = "SELECT * FROM usuarios WHERE usuarios_email=? AND usuarios_password=? ";
 
-  $resultado = $mysqli->query($query_users);
-  $usuarios = $resultado->fetch_all(MYSQLI_ASSOC);
+  $result_query = $connection_bd->prepare($query_users);
+  $result_query -> execute(array($email, $password));
+  $result_query = $result_query->fetchAll(PDO:: FETCH_ASSOC);
 
-  $cantidad_usuarios = count($usuarios);
+  $cantidad_usuarios = count($result_query);
 
   if ($cantidad_usuarios == 1) {
     $_SESSION['autorizado'] = true;
+    $_SESSION['usuario_id'] = $result_query[0]['usuarios_id'];
+    $_SESSION['usuario_nombre'] = $result_query[0]['usuarios_nombres'];
+    $_SESSION['usuario_avatar'] = $result_query[0]['usuarios_url_avatar'];
+
     echo '<meta http-equiv="refresh" content="0, starter.php">';
   } else {
     $msg.="Usuario no registrado!";
